@@ -1,17 +1,9 @@
 #![cfg_attr(windows, windows_subsystem = "windows")]
-#![deny(clippy::all, clippy::pedantic, clippy::nursery)]
+#![deny(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 
+use curl::easy::{Easy, List};
 use serde::Deserialize;
 use std::{fs::read_to_string, path::PathBuf};
-
-macro_rules! bail {
-    ($($arg:tt)*) => {
-        {
-            tracing::error!($($arg)*);
-            panic!($($arg)*);
-        }
-    };
-}
 
 fn main() {
     #[cfg(not(windows))]
@@ -23,13 +15,11 @@ fn main() {
         .with_writer(std::io::stdout)
         .with_level(true)
         .init();
-    let settings: Settings = toml::from_str(
-        &read_to_string(app_data().join("heartbeat.ini"))
-            .map_err(|e| bail!("can't read settings file: {e:?}"))
-            .unwrap(),
-    )
-    .map_err(|e| bail!("Invalid config file: {e:?}"))
-    .unwrap();
+    std::panic::set_hook(Box::new(|i| {
+        tracing::error!("PANIC!!! {:?}", i);
+    }));
+    let settings: Settings =
+        toml::from_str(&read_to_string(app_data().join("heartbeat.ini")).unwrap()).unwrap();
     ping(&settings.heartbeat.base_url, &settings.heartbeat.auth_token);
 }
 
@@ -58,13 +48,26 @@ fn ping(server_url: &str, authorization: &str) {
         return;
     }
     tracing::info!("Running heartbeat");
-    let res = ureq::post(&format!("{server_url}/api/beat"))
-        .set("Authorization", authorization)
-        .call();
-    if res.is_err() {
-        bail!("Failed to ping server: {:?}", res.as_ref().unwrap_err());
+    let mut easy = Easy::new();
+    easy.url(&format!("{server_url}/api/beat")).unwrap();
+    easy.post(true).unwrap();
+    let mut list = List::new();
+    list.append(&format!("Authorization: {authorization}"))
+        .unwrap();
+    easy.http_headers(list).unwrap();
+    let mut buf = Vec::new();
+    {
+        let mut transfer = easy.transfer();
+        transfer
+            .write_function(|data| {
+                buf.extend_from_slice(data);
+                Ok(data.len())
+            })
+            .unwrap();
+        transfer.perform().unwrap();
     }
-    tracing::info!("{}", res.unwrap().into_string().unwrap_or_default());
+    let response = String::from_utf8(buf).unwrap();
+    tracing::info!("{response}");
 }
 
 #[repr(C)]
