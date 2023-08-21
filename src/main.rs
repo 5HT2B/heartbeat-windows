@@ -1,4 +1,6 @@
 #![cfg_attr(windows, windows_subsystem = "windows")]
+#![deny(clippy::all, clippy::pedantic, clippy::nursery)]
+
 use serde::Deserialize;
 use std::{fs::read_to_string, path::PathBuf};
 
@@ -49,9 +51,13 @@ fn app_data() -> PathBuf {
 }
 
 fn ping(server_url: &str, authorization: &str) {
+    if is_locked() {
+        return;
+    }
     if get_idle_time() > 120_000 {
         return;
     }
+    tracing::info!("Running heartbeat");
     let res = ureq::post(&format!("{server_url}/api/beat"))
         .set("Authorization", authorization)
         .call();
@@ -70,6 +76,19 @@ struct LastInputInfo {
 #[link(name = "user32")]
 extern "system" {
     fn GetLastInputInfo(last_input_info: *mut LastInputInfo) -> bool;
+    fn OpenDesktopA(
+        lpsz_desktop: *const std::ffi::c_char,
+        dw_flags: u32,
+        f_inherit: bool,
+        dw_desired_access: u32,
+    ) -> *mut std::ffi::c_void;
+    fn OpenInputDesktop(
+        dw_flags: u32,
+        f_inherit: bool,
+        dw_desired_access: u32,
+    ) -> *mut std::ffi::c_void;
+    fn SwitchDesktop(h_desktop: *mut std::ffi::c_void) -> bool;
+    fn CloseDesktop(h_desktop: *mut std::ffi::c_void) -> bool;
 }
 
 #[link(name = "kernel32")]
@@ -79,7 +98,7 @@ extern "system" {
 
 fn get_idle_time() -> u32 {
     let mut last_input_info = LastInputInfo {
-        cb_size: std::mem::size_of::<LastInputInfo>() as u32,
+        cb_size: u32::try_from(std::mem::size_of::<LastInputInfo>()).unwrap(),
         dw_time: 0,
     };
     unsafe {
@@ -87,4 +106,23 @@ fn get_idle_time() -> u32 {
     }
     let current_time = unsafe { GetTickCount() };
     current_time - last_input_info.dw_time
+}
+
+fn is_locked() -> bool {
+    const DESKTOP_SWITCHDESKTOP: u32 = 0x0100;
+    let mut locked = false;
+    unsafe {
+        let mut hwnd = OpenInputDesktop(0, false, DESKTOP_SWITCHDESKTOP);
+        if hwnd.is_null() {
+            // maybe already lcoked?
+            hwnd = OpenDesktopA("Default\0".as_ptr().cast(), 0, false, DESKTOP_SWITCHDESKTOP);
+        }
+        if !hwnd.is_null() {
+            if !SwitchDesktop(hwnd) {
+                locked = true;
+            }
+            CloseDesktop(hwnd);
+        }
+    }
+    locked
 }
