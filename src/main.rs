@@ -1,4 +1,4 @@
-#![cfg_attr(task_scheduler, windows_subsystem = "windows")]
+#![cfg_attr(feature = "task_scheduler", windows_subsystem = "windows")]
 #![deny(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 
 use curl::easy::{Easy, List};
@@ -8,7 +8,7 @@ use std::{fs::read_to_string, path::PathBuf};
 fn main() {
     #[cfg(not(windows))]
     panic!("This program is only intended to run on Windows");
-    if !cfg!(task_scheduler) {
+    if !cfg!(feature = "task_scheduler") {
         interactive_config();
         return;
     }
