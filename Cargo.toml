@@ -11,16 +11,59 @@ publish = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-curl = "0.4.44"
-dirs = "5.0.1"
-serde = { version = "1.0.183", features = ["derive"] }
-toml = { version = "0.7.6", default-features = false, features = ["parse"] }
-tracing = "0.1.37"
-tracing-appender = "0.2.2"
-tracing-subscriber = "0.3.17"
+curl = { version = "0.4.44", optional = true }
+dirs = { version = "5.0.1", optional = true }
+serde = { version = "1.0.183", features = ["derive"], optional = true }
+toml = { version = "0.7.6", default-features = false, features = ["parse"], optional = true }
+tracing = { version = "0.1.37", optional = true }
+tracing-appender = { version = "0.2.2", optional = true }
+tracing-subscriber = { version = "0.3.17", optional = true }
+
+[dependencies.windows]
+version = "0.51.1"
+optional = true
+features = [
+  "Win32_Foundation",
+  "Win32_System_TaskScheduler",
+  "Win32_System_Com",
+  "Win32_System_Ole",
+  "Win32_System_Variant",
+  "Win32_System_Threading",
+  "Win32_Security",
+  "Win32_Security_Authorization",
+  "Win32_Security_Authentication_Identity",
+]
 
 [features]
-task_scheduler = []
+task_register = ["windows"]
+task_runner = [
+  "serde",
+  "toml",
+  "dirs",
+  "curl",
+  "tracing",
+  "tracing-appender",
+  "tracing-subscriber",
+]
+config = ["dirs"]
+
+[lib]
+name = "heartbeat"
+
+[[bin]]
+name = "heartbeat-task"
+path = "src/bin/task.rs"
+required-features = ["task_runner"]
+
+[[bin]]
+name = "heartbeat-config"
+path = "src/bin/config.rs"
+required-features = ["config"]
+
+[[bin]]
+name = "heartbeat-register"
+path = "src/bin/register.rs"
+required-features = ["task_register"]
 
 [profile.release]
 lto = true
