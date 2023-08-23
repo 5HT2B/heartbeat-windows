@@ -1,12 +1,11 @@
 #![deny(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
-#![allow(clippy::missing_errors_doc)]
+#![allow(clippy::missing_errors_doc, clippy::missing_panics_doc)]
 
 #[cfg(feature = "serde")]
 use serde::Deserialize;
 
 #[cfg(feature = "task_runner")]
 pub mod ping;
-#[cfg(feature = "task_register")]
 pub mod tasks;
 
 pub fn read_yes_no(prompt: &str, default: Option<bool>) -> std::io::Result<bool> {
@@ -108,17 +107,14 @@ pub fn app_data() -> std::path::PathBuf {
         .join("heartbeat")
 }
 
-#[cfg(any(feature = "config", feature = "task_register"))]
 #[link(name = "kernel32")]
 extern "system" {
     fn GetConsoleMode(h_console: *mut std::ffi::c_void, lp_mode: *mut u32) -> bool;
     fn GetStdHandle(n_std_handle: u32) -> *mut std::ffi::c_void;
 }
 
-#[cfg(any(feature = "config", feature = "task_register"))]
 const STDOUT: u32 = 4_294_967_285; // (DWORD)-11
 
-#[cfg(any(feature = "config", feature = "task_register"))]
 #[must_use]
 pub fn is_stdout_tty() -> bool {
     let handle = unsafe { GetStdHandle(STDOUT) };

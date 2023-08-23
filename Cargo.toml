@@ -19,23 +19,7 @@ tracing = { version = "0.1.37", optional = true }
 tracing-appender = { version = "0.2.2", optional = true }
 tracing-subscriber = { version = "0.3.17", optional = true }
 
-[dependencies.windows]
-version = "0.51.1"
-optional = true
-features = [
-  "Win32_Foundation",
-  "Win32_System_TaskScheduler",
-  "Win32_System_Com",
-  "Win32_System_Ole",
-  "Win32_System_Variant",
-  "Win32_System_Threading",
-  "Win32_Security",
-  "Win32_Security_Authorization",
-  "Win32_Security_Authentication_Identity",
-]
-
 [features]
-task_register = ["windows"]
 task_runner = [
   "serde",
   "toml",
@@ -46,7 +30,6 @@ task_runner = [
   "tracing-subscriber",
 ]
 config = ["dirs"]
-
 [lib]
 name = "heartbeat"
 
@@ -63,7 +46,6 @@ required-features = ["config"]
 [[bin]]
 name = "heartbeat-register"
 path = "src/bin/register.rs"
-required-features = ["task_register"]
 
 [profile.release]
 lto = true
