@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+set -euxo pipefail
+VERSION=${REF#"refs/tags/"}
+DIST=$(pwd)/dist
+
+echo "Packaging version $VERSION..."
+
+test -f Cargo.lock || cargo generate-lockfile
+
+echo "Building binaries..."
+EXECUTABLES=("heartbeat-task" "heartbeat-register" "heartbeat-config")
+FEATURES=("task_runner" "" "config")
+for i in "${!EXECUTABLES[@]}"; do
+    RUSTFLAGS="-D warnings -C target-feature=+crt-static" cargo build -F "${FEATURES[$i]}" --release --bin "${EXECUTABLES[$i]}"
+done
+
+echo "Copying release files..."
+mkdir -p "$DIST"
+for executable in "${EXECUTABLES[@]}"; do
+  cp "target/release/$executable" "$DIST"
+done
+cp LICENSE README.md Cargo.toml Cargo.lock "$DIST"
+
+cd "$DIST"
+echo "Creating release archive..."
+ARCHIVE=$DIST/heartbeat-$VERSION.zip
+7z a "$ARCHIVE" ./*
+echo "archive=$(pwd -W)/heartbeat-$VERSION.zip" >> "$GITHUB_OUTPUT"

@@ -30,6 +30,8 @@ task_runner = [
   "tracing-subscriber",
 ]
 config = ["dirs"]
+full = ["task_runner", "config"]
+
 [lib]
 name = "heartbeat"
 
@@ -53,3 +55,7 @@ opt-level = 'z'
 panic = 'abort'
 strip = true
 codegen-units = 1
+
+[workspace]
+members = [".", "bin/ref-type"]
+default-members = ["."]

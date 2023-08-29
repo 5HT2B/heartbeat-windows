@@ -1,4 +1,12 @@
-use std::{env::current_exe, fs::read_to_string, path::PathBuf, process::Command};
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+use std::{
+    env::{consts::EXE_SUFFIX, current_exe},
+    path::PathBuf,
+    process::Command,
+};
 
 #[must_use]
 pub fn generate_xml() -> String {
@@ -22,20 +30,18 @@ fn get_current_user_name() -> String {
 }
 
 fn get_task_scheduler_bin_path() -> std::io::Result<PathBuf> {
-    let this = current_exe()?;
-    let expected = this.parent().unwrap().join("heartbeat-task.exe");
-    if !expected.is_file() {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::NotFound,
-            format!("Expected task scheduler binary at {expected:?}, but it was not found"),
-        ));
+    let mut path = current_exe()?;
+    path.pop();
+    if path.ends_with("deps") {
+        path.pop();
     }
-    Ok(expected)
+    let exe = String::from("heartbeat-task") + EXE_SUFFIX;
+    path.push(exe);
+    Ok(path)
 }
 
 fn format_task(username: &str, sid: &str) -> String {
-    read_to_string("task.xml")
-        .unwrap()
+    include_str!("task.xml")
         .replace("{username}", username)
         .replace("{sid}", sid)
         .replace(
