@@ -1,3 +1,3 @@
 * text=auto
 * text eol=lf
-*xml text eol=crlf
+*.xml text eol=crlf
