@@ -1,0 +1,52 @@
+on:
+  push:
+  pull_request:
+    types:
+      - "opened"
+      - "reopened"
+      - "synchronize"
+
+jobs:
+  check:
+    runs-on: windows-latest
+    name: "Check rust stable"
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: setup latest rust stable
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
+      - name: setup nextest
+        uses: lmaotrigine/fetch-crate-action@mistress
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          owner: nextest-rs
+          name: nextest
+          bin: cargo-nextest
+      - name: setup just
+        uses: lmaotrigine/fetch-crate-action@mistress
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          owner: casey
+          name: just
+      - name: setup ripgrep
+        uses: lmaotrigine/fetch-crate-action@mistress
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          owner: BurntSushi
+          name: ripgrep
+          bin: rg
+      - name: check and test
+        run: |
+          just ci-lint check-forbidden
+        shell: bash
