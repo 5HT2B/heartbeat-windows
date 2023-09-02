@@ -5,7 +5,8 @@ _default:
 
 all: clean build
 
-ci-lint: check test
+ci-lint: check
+  @just test --all
 
 build *args:
   cargo build {{args}}

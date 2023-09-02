@@ -24,6 +24,10 @@ fn main() {
     };
     eprintln!("ref: {reference}");
     eprintln!("value: {value}");
+    if cfg!(test) {
+        println!("::set-output name=value::{value}");
+        return;
+    }
     env::var("GITHUB_OUTPUT")
         .map(|path| {
             OpenOptions::new()
