@@ -7,6 +7,7 @@
 
 use clap::{Arg, Command};
 use regex::Regex;
+#[cfg(not(feature = "nextest"))]
 use std::{env, fs::OpenOptions, io::Write};
 
 fn main() {
@@ -24,10 +25,10 @@ fn main() {
     };
     eprintln!("ref: {reference}");
     eprintln!("value: {value}");
-    if cfg!(test) {
-        println!("::set-output name=value::{value}");
-        return;
-    }
+    #[cfg(feature = "nextest")]
+    println!("value={value}");
+
+    #[cfg(not(feature = "nextest"))]
     env::var("GITHUB_OUTPUT")
         .map(|path| {
             OpenOptions::new()

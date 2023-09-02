@@ -6,7 +6,7 @@ _default:
 all: clean build
 
 ci-lint: check
-  @just test --all
+  @just test --all -F nextest
 
 build *args:
   cargo build {{args}}
