@@ -5,26 +5,24 @@
 #![forbid(unsafe_code)]
 #![deny(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 
+use clap::{Arg, Command};
 use regex::Regex;
 use std::{env, fs::OpenOptions, io::Write};
-use structopt::StructOpt;
-
-#[derive(StructOpt)]
-struct Arguments {
-    #[structopt(long)]
-    reference: String,
-}
 
 fn main() {
-    let args = Arguments::from_args();
+    let cmd = Command::new("ref-type").arg(Arg::new("reference").long("reference"));
+    let args = cmd.get_matches();
     let regex = Regex::new("^refs/tags/[[:digit:]]+[.][[:digit:]]+[.][[:digit:]]+$")
         .expect("Failed to compile release regex");
-    let value = if regex.is_match(&args.reference) {
+    let reference = args
+        .get_one::<String>("reference")
+        .expect("missing required argument `--reference`");
+    let value = if regex.is_match(reference) {
         "release"
     } else {
         "other"
     };
-    eprintln!("ref: {}", args.reference);
+    eprintln!("ref: {reference}");
     eprintln!("value: {value}");
     env::var("GITHUB_OUTPUT")
         .map(|path| {
