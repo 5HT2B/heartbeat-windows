@@ -8,9 +8,9 @@ ships with three binaries:
   which installs some dependencies to make web requests, read configuration, and write
   logs.
 - `heartbeat-config`: A helper binary to (over)write the configuration used by the task
-  runner. You can use this script to set the `Authorization` token and base URL for your
-  server. Requires the `config` feature which installs dependencies to figure out the
-  location for the config file on your system.
+  runner. You can use this script to set the `Auth` token, `Device` name, and
+  base URL for your server. Requires the `config` feature which installs
+  dependencies to figure out the location for the config file on your system.
 - `heartbeat-register`: This script generates an XML file that can be imported into Task
   Scheduler. The `heartbeat-task` binary must be compiled/installed ***prior*** to
   running this script.
