@@ -22,7 +22,7 @@ impl From<std::string::FromUtf8Error> for Error {
     }
 }
 
-pub fn ping(server_url: &str, authorization: &str) -> Result<(), Error> {
+pub fn ping(server_url: &str, authorization: &str, device: &str) -> Result<(), Error> {
     if is_locked() {
         return Ok(());
     }
@@ -34,7 +34,8 @@ pub fn ping(server_url: &str, authorization: &str) -> Result<(), Error> {
     easy.url(&format!("{server_url}/api/beat"))?;
     easy.post(true)?;
     let mut list = List::new();
-    list.append(&format!("Authorization: {authorization}"))?;
+    list.append(&format!("Auth: {authorization}"))?;
+    list.append(&format!("Device: {device}"))?;
     easy.http_headers(list)?;
     let mut buf = Vec::new();
     {

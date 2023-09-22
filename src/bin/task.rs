@@ -20,5 +20,10 @@ fn main() {
     }));
     let settings: Settings =
         toml::from_str(&read_to_string(app_data().join("heartbeat.ini")).unwrap()).unwrap();
-    ping(&settings.heartbeat.base_url, &settings.heartbeat.auth_token).unwrap();
+    ping(
+        &settings.heartbeat.base_url,
+        &settings.heartbeat.auth_token,
+        &settings.heartbeat.device,
+    )
+    .unwrap();
 }

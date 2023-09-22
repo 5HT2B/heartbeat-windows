@@ -55,6 +55,7 @@ pub struct Settings {
 pub struct SettingsInner {
     pub base_url: String,
     pub auth_token: String,
+    pub device: String,
 }
 
 #[cfg(feature = "config")]
@@ -82,7 +83,19 @@ pub fn interactive_config() -> std::io::Result<()> {
         }
         break;
     }
-    let auth_token = buf.trim();
+    let auth_token = buf.trim().to_string();
+    buf.clear();
+    prompt = "Device name: ";
+    loop {
+        eprint!("{prompt}");
+        std::io::stdin().read_line(&mut buf)?;
+        if buf.trim().is_empty() {
+            buf.clear();
+            continue;
+        }
+        break;
+    }
+    let device_name = buf.trim();
     if is_stdout_tty() {
         eprintln!("\n");
     }
@@ -90,6 +103,7 @@ pub fn interactive_config() -> std::io::Result<()> {
         r#"[heartbeat]
 base_url = "{base_url}"
 auth_token = "{auth_token}"
+device = "{device_name}"
 "#
     );
     if is_stdout_tty() {
