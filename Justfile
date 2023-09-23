@@ -5,7 +5,7 @@ _default:
 
 all: clean build
 
-ci-lint: check
+ci-lint: check check-forbidden
   @just test --all -F nextest
 
 build *args:
