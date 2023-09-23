@@ -11,5 +11,4 @@ clap = { version = "4.4.2", default-features = false, features = ["std"] }
 regex = "1.9.4"
 
 [features]
-default = []
 nextest = []
