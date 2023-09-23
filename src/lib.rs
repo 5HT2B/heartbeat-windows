@@ -5,6 +5,9 @@
 #![deny(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 #![allow(clippy::missing_errors_doc, clippy::missing_panics_doc)]
 
+#[cfg(not(target_os = "windows"))]
+compile_error!("This crate only supports Windows targets");
+
 #[cfg(feature = "serde")]
 use serde::Deserialize;
 
