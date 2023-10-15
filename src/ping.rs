@@ -98,7 +98,7 @@ fn is_locked() -> bool {
     unsafe {
         let mut hwnd = OpenInputDesktop(0, false, DESKTOP_SWITCHDESKTOP);
         if hwnd.is_null() {
-            // maybe already lcoked?
+            // maybe already locked?
             hwnd = OpenDesktopA("Default\0".as_ptr().cast(), 0, false, DESKTOP_SWITCHDESKTOP);
         }
         if !hwnd.is_null() {
