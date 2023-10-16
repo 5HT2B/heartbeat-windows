@@ -2,6 +2,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
+//! Task XML generation and registration.
+
 use std::{
     env::{consts::EXE_SUFFIX, current_exe},
     path::PathBuf,
@@ -9,12 +11,15 @@ use std::{
 };
 
 #[must_use]
+/// Formats the included XML template with the current user's username and SID
 pub fn generate_xml() -> String {
     let username = get_current_user_name();
     let sid = get_current_user_sid();
     format_task(&username, &sid)
 }
 
+// we could just call into the Windows API, but these are one-time operations and
+// this is just easier.
 fn get_current_user_sid() -> String {
     let cmd = Command::new("powershell")
     .arg("-Command")
@@ -50,6 +55,20 @@ fn format_task(username: &str, sid: &str) -> String {
         )
 }
 
+/// Registers the task denoted by the `xml` string with the Task Scheduler.
+///
+/// This first writes the XML to a file, and then calls `schtasks.exe` to register the task.
+///
+/// I could have used the Windows API, but I really do not want to deal with COM and OLE.
+///
+/// # Returns
+///
+/// A tuple of `(stdout, stderr)`.
+///
+/// # Panics
+///
+/// This function panics if `schtasks.exe` fails or returns
+/// invalid UTF-8. In the latter case you have bigger problems.
 #[must_use]
 pub fn register_task_xml(xml: &str) -> (String, String) {
     std::fs::write("heartbeat.xml", xml).unwrap();

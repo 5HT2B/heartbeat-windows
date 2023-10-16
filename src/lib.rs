@@ -2,8 +2,20 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-#![deny(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
-#![allow(clippy::missing_errors_doc, clippy::missing_panics_doc)]
+//! # heartbeat
+//! A [heartbeat](https://github.com/lmaotrigine/heartbeat) client for Windows.
+//!
+//! This library contains common code used in all three binaries.
+//!
+//! It doesn't have a `#![forbid(unsafe_code)]` because we call into the Windows API directly.
+
+#![deny(
+    clippy::all,
+    clippy::pedantic,
+    clippy::nursery,
+    clippy::cargo,
+    missing_docs
+)]
 
 #[cfg(not(target_os = "windows"))]
 compile_error!("This crate only supports Windows targets");
@@ -15,6 +27,13 @@ use serde::Deserialize;
 pub mod ping;
 pub mod tasks;
 
+/// Prints a prompt to stderr and reads "y" or "n" from stdin.
+///
+/// Input has to be y/n, case-sensitive, yes/no won't work.
+///
+/// # Errors
+///
+/// This function will return an error if reading from stdin fails.
 pub fn read_yes_no(prompt: &str, default: Option<bool>) -> std::io::Result<bool> {
     let mut buf = String::new();
     let to_append = match default {
@@ -47,20 +66,31 @@ pub fn read_yes_no(prompt: &str, default: Option<bool>) -> std::io::Result<bool>
     Ok(buf == "y")
 }
 
+/// Settings for the client. This is read from `heartbeat.ini`.
 #[cfg(feature = "serde")]
 #[derive(Deserialize)]
 pub struct Settings {
+    /// Settings for the client. This is read from `heartbeat.ini`.
     pub heartbeat: SettingsInner,
 }
 
+/// Settings for the client. This is read from `heartbeat.ini`.
 #[cfg(feature = "serde")]
 #[derive(Deserialize)]
 pub struct SettingsInner {
+    /// The base URL of the server.
     pub base_url: String,
+    /// The authorization token to use.
     pub auth_token: String,
+    /// The `Device` header to use.
     pub device: String,
 }
 
+/// Interactively prompts the user for the server URL and authorization token.
+///
+/// # Errors
+///
+/// This function will return an error if reading from stdin fails.
 #[cfg(feature = "config")]
 pub fn interactive_config() -> std::io::Result<()> {
     let mut buf = String::new();
@@ -120,6 +150,7 @@ device = "{device_name}"
     Ok(())
 }
 
+/// Returns the path to `%APPDATA%\heartbeat`.
 #[cfg(feature = "dirs")]
 #[must_use]
 pub fn app_data() -> std::path::PathBuf {
@@ -130,12 +161,15 @@ pub fn app_data() -> std::path::PathBuf {
 
 #[link(name = "kernel32")]
 extern "system" {
+    // ref: https://docs.microsoft.com/en-us/windows/console/getconsolemode
     fn GetConsoleMode(h_console: *mut std::ffi::c_void, lp_mode: *mut u32) -> bool;
+    // ref: https://docs.microsoft.com/en-us/windows/console/getstdhandle
     fn GetStdHandle(n_std_handle: u32) -> *mut std::ffi::c_void;
 }
 
 const STDOUT: u32 = 4_294_967_285; // (DWORD)-11
 
+/// Returns whether stdout is a TTY.
 #[must_use]
 pub fn is_stdout_tty() -> bool {
     let handle = unsafe { GetStdHandle(STDOUT) };
