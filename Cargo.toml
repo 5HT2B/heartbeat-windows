@@ -2,52 +2,59 @@
 name = "heartbeat-windows"
 description = "Heartbeat client for Windows. Can be used as an action in Task Scheduler."
 license = "MPL-2.0"
-authors = ["VJ <root@5ht2.me>"]
+authors = ["Isis <root@5ht2.me>"]
 repository = "https://github.com/lmaotrigine/heartbeat-windows"
 version = "0.1.0"
 edition = "2021"
 publish = false
+default-run = "heartbeat-client"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-curl = { version = "0.4.44", optional = true }
-dirs = { version = "5.0.1", optional = true }
-serde = { version = "1.0.183", features = ["derive"], optional = true }
-toml = { version = "0.7.6", default-features = false, features = ["parse"], optional = true }
-tracing = { version = "0.1.37", optional = true }
-tracing-appender = { version = "0.2.2", optional = true }
-tracing-subscriber = { version = "0.3.17", optional = true }
+curl = { version = "0.4", optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
+toml = { version = "0.8", default-features = false, features = ["parse"], optional = true }
+tracing = { version = "0.1", optional = true }
+tracing-appender = { version = "0.2", optional = true }
+tracing-subscriber = { version = "0.3", optional = true }
+heartbeat-sys = { git = "https://git.5ht2.me/lmaotrigine/heartbeat-sys", features = ["cli"] }
+anyhow = "1"
+clap = { version = "4", features = ["derive", "wrap_help"] }
+
+[dependencies.windows-sys]
+version = "0.52"
+features = [
+  "Win32_Foundation",
+  "Win32_Security_Authorization",
+  "Win32_System_LibraryLoader",
+  "Win32_System_StationsAndDesktops",
+  "Win32_System_SystemInformation",
+  "Win32_System_WindowsProgramming",
+  "Win32_UI_Input_KeyboardAndMouse",
+]
 
 [features]
 task_runner = [
   "serde",
   "toml",
-  "dirs",
   "curl",
   "tracing",
   "tracing-appender",
   "tracing-subscriber",
 ]
-config = ["dirs"]
-full = ["task_runner", "config"]
 
 [lib]
 name = "heartbeat"
 
 [[bin]]
+name = "heartbeat-client"
+path = "src/main.rs"
+
+[[bin]]
 name = "heartbeat-task"
 path = "src/bin/task.rs"
 required-features = ["task_runner"]
-
-[[bin]]
-name = "heartbeat-config"
-path = "src/bin/config.rs"
-required-features = ["config"]
-
-[[bin]]
-name = "heartbeat-register"
-path = "src/bin/register.rs"
 
 [profile.release]
 lto = true

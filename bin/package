@@ -13,21 +13,24 @@ echo "Packaging version $VERSION..."
 test -f Cargo.lock || cargo generate-lockfile
 
 echo "Building binaries..."
-EXECUTABLES=("heartbeat-task" "heartbeat-register" "heartbeat-config")
-FEATURES=("task_runner" "" "config")
+EXECUTABLES=("heartbeat-task" "heartbeat-client")
+FEATURES=("task_runner" "")
 for i in "${!EXECUTABLES[@]}"; do
-    RUSTFLAGS="-D warnings -C target-feature=+crt-static" cargo build -F "${FEATURES[$i]}" --release --bin "${EXECUTABLES[$i]}"
+  RUSTFLAGS="-D warnings -C target-feature=+crt-static" cargo build -F "${FEATURES[$i]}" --release --bin "${EXECUTABLES[$i]}" --target "$TARGET"
 done
 
 echo "Copying release files..."
 mkdir -p "$DIST"
 for executable in "${EXECUTABLES[@]}"; do
-  cp "target/release/$executable" "$DIST"
+  cp "target/$TARGET/release/$executable.exe" "$DIST"
 done
-cp LICENSE README.md Cargo.toml Cargo.lock "$DIST"
+cp LICENSE README.md "$DIST"
 
 cd "$DIST"
 echo "Creating release archive..."
-ARCHIVE=$DIST/heartbeat-$VERSION.zip
+ARCHIVE=$DIST/heartbeat-client-$VERSION-$TARGET.zip
 7z a "$ARCHIVE" ./*
-echo "archive=$(pwd -W)/heartbeat-$VERSION.zip" >> "$GITHUB_OUTPUT"
+certutil -hashfile "$ARCHIVE" SHA256 | grep -o '[0-9a-f]\{64\}' > "$ARCHIVE".sha256
+echo "archive=$(pwd -W)/heartbeat-client-$VERSION-$TARGET.zip" >> "$GITHUB_OUTPUT"
+echo "checksumfile=$(pwd -W)/heartbeat-client-$VERSION-$TARGET.zip.sha256" >> "$GITHUB_OUTPUT"
+

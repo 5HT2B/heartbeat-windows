@@ -13,16 +13,12 @@ use std::{env, fs::OpenOptions, io::Write};
 fn main() {
     let cmd = Command::new("ref-type").arg(Arg::new("reference").long("reference"));
     let args = cmd.get_matches();
-    let regex = Regex::new("^refs/tags/[[:digit:]]+[.][[:digit:]]+[.][[:digit:]]+$")
-        .expect("Failed to compile release regex");
+    let regex =
+        Regex::new("^refs/tags/[[:digit:]]+[.][[:digit:]]+[.][[:digit:]]+$").expect("Failed to compile release regex");
     let reference = args
         .get_one::<String>("reference")
         .expect("missing required argument `--reference`");
-    let value = if regex.is_match(reference) {
-        "release"
-    } else {
-        "other"
-    };
+    let value = if regex.is_match(reference) { "release" } else { "other" };
     eprintln!("ref: {reference}");
     eprintln!("value: {value}");
     #[cfg(feature = "nextest")]

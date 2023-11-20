@@ -1,19 +1,19 @@
 # heartbeat-windows
 
 This is the Windows client for [Heartbeat](https://github.com/lmaotrigine/heartbeat). It
-ships with three binaries:
+ships with two binaries.
 
 - `heartbeat-task`: Pings the central server if an input device has been used in the
   last two minutes, and the workstation is unlocked. Requires the `task_runner` feature
   which installs some dependencies to make web requests, read configuration, and write
-  logs.
-- `heartbeat-config`: A helper binary to (over)write the configuration used by the task
-  runner. You can use this script to set the `Authorization` token and base URL for your
-  server. Requires the `config` feature which installs dependencies to figure out the
-  location for the config file on your system.
-- `heartbeat-register`: This script generates an XML file that can be imported into Task
-  Scheduler. The `heartbeat-task` binary must be compiled/installed ***prior*** to
-  running this script.
+  logs. This binary is linked with `/SUBSYSTEM:WINDOWS`, so that a console doesn't pop
+  up each time it runs. 
+- `heartbeat-client`: This is the CLI app you will need to use to configure the client and
+  register the task using Task Scheduler. The `heartbeat-task` binary must be
+  compiled/installed ***prior*** to running this script, and both the executables
+  must be placed in the same directory to work properly. I place these constraints
+  on you because Windows places other constraints on me, which I've tried really
+  hard to work around.
 
 ## Prerequisites
 
@@ -31,5 +31,6 @@ toolchain installed.
 ## Troubleshooting
 
 The panic hook in the `heartbeat-task` binary simply writes the panic info to the log file. The
-location of this file is `%APPDATA%\heartbeat\heartbeat.log`. If you see something
-untoward in the logs, please open an issue and include the relevant lines.
+location of this file is `%HEARTBEAT_HOME%\logs\heartbeat.log`. `%HEARTBEAT_HOME%` by default
+is `%USERPROFILE%\.heartbeat`. If you see something untoward in the logs, please open an 
+issue and include the relevant lines.

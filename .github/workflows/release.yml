@@ -10,24 +10,34 @@ defaults:
 
 jobs:
   release:
+    strategy:
+      matrix:
+        target:
+          - aarch64-pc-windows-msvc
+          - i686-pc-windows-msvc
+          - x86_64-pc-windows-msvc
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
+          target: ${{ matrix.target }}
       - id: ref-type
         run: cargo run -p ref-type -- --reference ${{ github.ref }}
       - id: package
         env:
           REF: ${{ github.ref }}
+          TARGET: ${{ matrix.target }}
         run: ./bin/package
         shell: bash
       - uses: softprops/action-gh-release@v1
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         with:
           draft: false
-          files: ${{ steps.package.outputs.archive }}
+          files: |
+            ${{ steps.package.outputs.archive }}
+            ${{ steps.package.outputs.checksumfile }}
           prerelease: ${{ steps.ref-type.outputs.value != 'release' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
