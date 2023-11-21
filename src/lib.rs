@@ -151,6 +151,10 @@ device = "{device_name}"
 }
 
 /// Returns the path to `%APPDATA%\heartbeat`.
+///
+/// # Panics
+///
+/// This function will panic if `%APPDATA%` doesn't exist.
 #[cfg(feature = "dirs")]
 #[must_use]
 pub fn app_data() -> std::path::PathBuf {
