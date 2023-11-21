@@ -5,10 +5,12 @@
 //! Task XML generation and registration.
 
 use anyhow::{Context, Result};
+use heartbeat_sys::heartbeat_home;
 use std::{
     env::{consts::EXE_SUFFIX, current_exe},
     io,
-    path::PathBuf,
+    ops::Deref,
+    path::{Path, PathBuf},
     process::Command,
     ptr,
 };
@@ -196,13 +198,32 @@ fn format_task(username: &str, sid: &str) -> String {
 /// This function returns an error if `schtasks.exe` fails or returns
 /// invalid UTF-8. In the latter case you have bigger problems.
 pub fn register_task_xml(xml: &str) -> Result<(String, String)> {
-    std::fs::write("heartbeat.xml", xml)?;
+    let path = heartbeat_home()?.join("heartbeat.xml");
+    let file = File(path);
+    std::fs::write(&*file, xml)?;
     let output = Command::new("schtasks")
         .args(["/create", "/xml", "heartbeat.xml", "/tn", "\"Heartbeat\"", "/f"])
         .output()
         .context("failed to run schtasks.exe")?;
     let stdout = String::from_utf8(output.stdout)?;
     let stderr = String::from_utf8(output.stderr)?;
-    let _ = std::fs::remove_file("heartbeat.xml");
     Ok((stdout, stderr))
+}
+
+struct File(PathBuf);
+
+impl Deref for File {
+    type Target = Path;
+
+    fn deref(&self) -> &Self::Target {
+        self.0.as_path()
+    }
+}
+
+impl Drop for File {
+    fn drop(&mut self) {
+        if std::fs::metadata(&self.0).ok().as_ref().map(std::fs::Metadata::is_file) == Some(true) {
+            let _ = std::fs::remove_file(&self.0);
+        }
+    }
 }
