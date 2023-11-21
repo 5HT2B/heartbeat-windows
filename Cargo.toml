@@ -2,8 +2,8 @@
 name = "heartbeat-windows"
 description = "Heartbeat client for Windows. Can be used as an action in Task Scheduler."
 license = "MPL-2.0"
-authors = ["VJ <root@5ht2.me>"]
-repository = "https://github.com/lmaotrigine/heartbeat-windows"
+authors = ["Isis <root@5ht2.me>"]
+repository = "https://github.com/5HT2B/heartbeat-windows"
 version = "0.1.0"
 edition = "2021"
 publish = false

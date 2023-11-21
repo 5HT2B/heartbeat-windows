@@ -23,7 +23,7 @@ should work fine on older versions that are still supported by Microsoft.
 ## Installation
 
 Pre-compiled, statically-linked binaries are available in the
-[releases](https://github.com/lmaotrigine/heartbeat-windows/releases) page.
+[releases](https://github.com/5HT2B/heartbeat-windows/releases) page.
 
 Alternatively, you can clone the repository and build from source if you have a Rust
 toolchain installed.
