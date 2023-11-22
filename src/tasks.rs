@@ -26,8 +26,9 @@ use windows_sys::Win32::{
 ///
 /// # Panics
 ///
-/// This function dies if it can't get the current user's name or security identifier,
-/// or if the `heartbeat-task` executable isn't present alongside the current executable.
+/// This function dies if it can't get the current user's name or security
+/// identifier, or if the `heartbeat-task` executable isn't present alongside
+/// the current executable.
 pub fn generate_xml() -> String {
     let user = get_current_user().expect("something went wrong lol");
     format_task(&user.username, &user.sid)
@@ -185,9 +186,11 @@ fn format_task(username: &str, sid: &str) -> String {
 
 /// Registers the task denoted by the `xml` string with the Task Scheduler.
 ///
-/// This first writes the XML to a file, and then calls `schtasks.exe` to register the task.
+/// This first writes the XML to a file, and then calls `schtasks.exe` to
+/// register the task.
 ///
-/// I could have used the Windows API, but I really do not want to deal with COM and OLE.
+/// I could have used the Windows API, but I really do not want to deal with COM
+/// and OLE.
 ///
 /// # Returns
 ///

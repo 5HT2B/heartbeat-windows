@@ -7,7 +7,8 @@
 //!
 //! This library contains common code used in the binaries.
 //!
-//! It doesn't have a `#![forbid(unsafe_code)]` because we call into the Windows API directly.
+//! It doesn't have a `#![forbid(unsafe_code)]` because we call into the Windows
+//! API directly.
 
 #![deny(
     clippy::all,
@@ -35,7 +36,8 @@ pub mod tasks;
 #[cfg(feature = "serde")]
 #[derive(Deserialize)]
 pub struct Settings {
-    /// Settings for the client. This is read from `$HEARTBEAT_HOME/config.toml`.
+    /// Settings for the client. This is read from
+    /// `$HEARTBEAT_HOME/config.toml`.
     pub client: SettingsInner,
 }
 

@@ -6,10 +6,11 @@ fn main() {
     }
     // only search system32 for DLLs.
     //
-    // this applies to DLLs loaded at load time. however, this setting is ignored before Windows 10 RS1 (aka 1601),
-    // https://learn.microsoft.com/en-us/cpp/build/reference/dependentloadflag?view=msvc-170
+    // this applies to DLLs loaded at load time. however, this setting is ignored
+    // before Windows 10 RS1 (aka 1601), https://learn.microsoft.com/en-us/cpp/build/reference/dependentloadflag?view=msvc-170
     println!("cargo:rustc-link-arg-bin=heartbeat-client=/DEPENDENTLOADFLAG:0x800");
     println!("cargo:rustc-link-arg-bin=heartbeat-task=/DEPENDENTLOADFLAG:0x800");
+    #[rustfmt::skip] // i now see why this feature is unstable.
     // delay load
     //
     // delay load `bcrypt.dll` which isn't a "known DLL"*.

@@ -17,8 +17,8 @@ use windows_sys::Win32::{
 ///
 /// # Errors
 ///
-/// This function will return an error if there is a network error, the server is unreachable,
-/// or [`curl`] otherwise returns an error.
+/// This function will return an error if there is a network error, the server
+/// is unreachable, or [`curl`] otherwise returns an error.
 pub fn ping(server_url: &str, authorization: &str) -> Result<(), curl::Error> {
     if is_locked() {
         return Ok(());
