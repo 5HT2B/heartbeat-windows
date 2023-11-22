@@ -7,7 +7,7 @@ ships with two binaries.
   last two minutes, and the workstation is unlocked. Requires the `task_runner` feature
   which installs some dependencies to make web requests, read configuration, and write
   logs. This binary is linked with `/SUBSYSTEM:WINDOWS`, so that a console doesn't pop
-  up each time it runs. 
+  up each time it runs.
 - `heartbeat-client`: This is the CLI app you will need to use to configure the client and
   register the task using Task Scheduler. The `heartbeat-task` binary must be
   compiled/installed ***prior*** to running this script, and both the executables
@@ -32,5 +32,5 @@ toolchain installed.
 
 The panic hook in the `heartbeat-task` binary simply writes the panic info to the log file. The
 location of this file is `%HEARTBEAT_HOME%\logs\heartbeat.log`. `%HEARTBEAT_HOME%` by default
-is `%USERPROFILE%\.heartbeat`. If you see something untoward in the logs, please open an 
+is `%USERPROFILE%\.heartbeat`. If you see something untoward in the logs, please open an
 issue and include the relevant lines.
