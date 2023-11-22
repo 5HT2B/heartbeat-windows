@@ -4,7 +4,7 @@ description = "Heartbeat client for Windows. Can be used as an action in Task Sc
 license = "MPL-2.0"
 authors = ["Isis <root@5ht2.me>"]
 repository = "https://github.com/5HT2B/heartbeat-windows"
-version = "0.1.0"
+version = "0.1.1-a"
 edition = "2021"
 publish = false
 default-run = "heartbeat-client"
@@ -33,6 +33,9 @@ features = [
   "Win32_System_WindowsProgramming",
   "Win32_UI_Input_KeyboardAndMouse",
 ]
+
+[build-dependencies]
+heartbeat-sys = { git = "https://git.5ht2.me/lmaotrigine/heartbeat-sys" }
 
 [features]
 task_runner = [

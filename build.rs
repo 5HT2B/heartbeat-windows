@@ -1,4 +1,6 @@
 fn main() {
+    let version = heartbeat_sys::build::long_version(env!("CARGO_PKG_VERSION"));
+    println!("cargo:rustc-env=HB_VERSION={version}");
     if std::env::var("CARGO_CFG_TARGET_ENV").as_deref() != Ok("msvc") {
         return;
     }

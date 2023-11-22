@@ -228,7 +228,7 @@ checksum = "f93e7192158dbcda357bdec5fb5788eebf8bbac027f3f33e719d29135ae84156"
 [[package]]
 name = "heartbeat-sys"
 version = "0.1.0"
-source = "git+https://git.5ht2.me/lmaotrigine/heartbeat-sys#93c755ce5fde67be00b6abd9aa87736a86e52e04"
+source = "git+https://git.5ht2.me/lmaotrigine/heartbeat-sys#d767efe32861fb1f354dc5d8b009a9c4727d092a"
 dependencies = [
  "anyhow",
  "libc",
@@ -239,7 +239,7 @@ dependencies = [
 
 [[package]]
 name = "heartbeat-windows"
-version = "0.1.0"
+version = "0.1.1-a"
 dependencies = [
  "anyhow",
  "clap",

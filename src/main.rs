@@ -17,6 +17,7 @@ use windows_sys::Win32::System::LibraryLoader::{SetDefaultDllDirectories, LOAD_L
 
 /// The Heartbeat Client for Windows
 #[derive(Debug, Parser)]
+#[clap(version = env!("HB_VERSION"))]
 struct Cli {
     #[clap(subcommand)]
     subcommand: Command,
