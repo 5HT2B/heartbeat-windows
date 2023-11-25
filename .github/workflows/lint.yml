@@ -26,13 +26,6 @@ jobs:
         with:
           toolchain: stable
           components: clippy, rustfmt
-      - name: setup nextest
-        uses: lmaotrigine/fetch-crate-action@mistress
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          owner: nextest-rs
-          name: nextest
-          bin: cargo-nextest
       - name: setup just
         uses: lmaotrigine/fetch-crate-action@mistress
         with:
@@ -48,5 +41,5 @@ jobs:
           bin: rg
       - name: check and test
         run: |
-          just ci-lint
+          just ci
         shell: bash

@@ -24,7 +24,8 @@ jobs:
           toolchain: stable
           target: ${{ matrix.target }}
       - id: ref-type
-        run: cargo run -p ref-type -- --reference ${{ github.ref }}
+        run: ./bin/ref-type ${{ github.ref }}
+        shell: bash
       - id: package
         env:
           REF: ${{ github.ref }}

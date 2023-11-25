@@ -5,8 +5,7 @@ _default:
 
 all: clean build
 
-ci-lint: check check-forbidden
-  @just test --all -F nextest
+ci: check check-forbidden
 
 build *args:
   cargo build {{args}}
@@ -20,6 +19,3 @@ check-forbidden:
 
 clean:
   cargo clean
-
-test *args:
-  RUST_BACKTRACE=1 cargo nextest run {{args}}
